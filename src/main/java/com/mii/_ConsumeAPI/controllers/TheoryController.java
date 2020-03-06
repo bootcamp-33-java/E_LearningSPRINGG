@@ -11,22 +11,23 @@ import com.mii._ConsumeAPI.entities.Theory;
 import com.mii._ConsumeAPI.services.QuestionServices;
 import com.mii._ConsumeAPI.services.QuizService;
 import com.mii._ConsumeAPI.services.TheoryService;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
@@ -85,7 +86,7 @@ public class TheoryController {
             redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
             return "redirect:/";
         }
-        
+
         try {
             // Get the file and save it somewhere
             byte[] bytes = file.getBytes();
@@ -106,6 +107,23 @@ public class TheoryController {
         theoryservice.save(t);
         System.out.println(title + definition + upload + kelas);
         return "redirect:/theory";
+    }
+
+    @RequestMapping(value = "/file/{file_name}", method = RequestMethod.GET)
+    public void getFile(
+            @PathVariable("file_name") String fileName,
+            HttpServletResponse response) {
+        try {
+            // get your file as InputStream
+//            InputStream is = response.setContentType("application/pdf");
+      // copy it to response's OutputStream
+//      org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+            response.flushBuffer();
+        } catch (IOException ex) {
+//            log.info("Error writing file to output stream. Filename was '{}'", fileName, ex);
+            throw new RuntimeException("IOError writing file to output stream");
+        }
+
     }
 
 }
